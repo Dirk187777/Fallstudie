@@ -1,0 +1,19 @@
+{% load shop_tags %}<svg viewBox="0 0 200 250" class="{{ css_class }}" role="img" aria-label="Dose {{ name }}">
+  <ellipse cx="100" cy="242" rx="66" ry="5" fill="#000" opacity=".12"/>
+  <rect x="42" y="6" width="116" height="28" rx="7" fill="#0c0a09"/>
+  <rect x="34" y="30" width="132" height="208" rx="16" fill="#1c1917"/>
+  <rect x="34" y="30" width="132" height="5" fill="#292524"/>
+  <text x="100" y="70" text-anchor="middle" fill="#fff" font-size="14" font-weight="900" letter-spacing="2">MISCHWERK</text>
+  <text x="100" y="84" text-anchor="middle" fill="#a8a29e" font-size="6" letter-spacing="1.2">{{ subtitle }}</text>
+  <rect x="34" y="100" width="132" height="110" fill="{{ label_color }}" data-fill="fill"/>
+  <text x="46" y="124" fill="#1c1917" font-size="12" font-weight="800">{{ name|truncatechars:17 }}</text>
+  <text x="46" y="138" fill="#1c1917" font-size="7.5" opacity=".7">{{ base|upper }}</text>
+  <rect x="46" y="156" width="108" height="44" fill="#fff" opacity=".45"/>
+  {% for layer in layers %}
+    <rect data-layer="{{ layer.key }}" x="46" y="{{ layer.y|stringformat:'s' }}" width="108" height="{{ layer.height|stringformat:'s' }}" fill="{{ layer.color }}" stroke="#1c1917" stroke-opacity=".15" stroke-width=".5"/>
+  {% endfor %}
+  <rect x="46" y="156" width="108" height="44" rx="6" fill="none" stroke="{{ label_color }}" stroke-width="3" data-fill="stroke"/>
+  <rect x="46" y="156" width="108" height="44" rx="5" fill="none" stroke="#1c1917" stroke-opacity=".5" stroke-width="1"/>
+  <text x="100" y="226" text-anchor="middle" fill="#a8a29e" font-size="6.5" letter-spacing="1.5">{{ can_grams|weight|upper }} · {{ portions }} PORTIONEN</text>
+  <rect x="44" y="38" width="7" height="192" rx="3.5" fill="#fff" opacity=".07"/>
+</svg>

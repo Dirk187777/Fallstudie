@@ -1,0 +1,6 @@
+<nav class="mb-6 flex gap-6 border-b border-stone-200 text-sm font-semibold dark:border-stone-800" aria-label="Betrieb">
+  {% url 'backoffice:order_list' as orders_url %}{% url 'backoffice:stock_list' as stock_url %}
+  <a href="{{ orders_url }}" class="-mb-px border-b-2 pb-3 {% if request.path == orders_url %}border-stone-950 dark:border-white{% else %}border-transparent text-stone-500{% endif %}">Bestellungen</a>
+  <a href="{{ stock_url }}" class="-mb-px border-b-2 pb-3 {% if request.path == stock_url %}border-stone-950 dark:border-white{% else %}border-transparent text-stone-500{% endif %}">Lager</a>
+  <a href="{% url 'admin:shop_ingredient_changelist' %}" class="-mb-px border-b-2 border-transparent pb-3 text-stone-500">Nachfüllen im Admin ↗</a>
+</nav>

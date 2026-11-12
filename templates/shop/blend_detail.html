@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+
+{% block title %}{{ blend.name }} {{ blend.flavor }} · Mischwerk{% endblock %}
+
+{% block content %}
+<a href="{% url 'shop:home' %}#{{ blend.line }}" class="text-sm text-stone-500 hover:underline">← Alle Produkte</a>
+<div class="mt-4 grid gap-10 md:grid-cols-2">
+  <div class="grid aspect-square place-items-center rounded-[2rem] bg-stone-100 p-10 md:sticky md:top-24 dark:bg-stone-900">
+    {% can blend.ingredients blend.name "h-full max-h-[28rem] w-auto" size %}
+  </div>
+
+  <div>
+    <div class="flex flex-wrap gap-2">
+      {% if summary.contains_caffeine %}<span class="badge">Mit Koffein</span>{% endif %}
+      <span class="chip">{{ blend.line_label }}</span>
+      {% if summary.protein %}<span class="chip">{{ summary.protein|floatformat:0 }} g Eiweiß pro Portion</span>{% endif %}
+    </div>
+    <h1 class="mt-4 text-4xl font-black tracking-tight md:text-5xl">{{ blend.name }}</h1>
+    {% if blend.description %}<p class="mt-2 text-xl">{{ blend.description }}</p>{% endif %}
+    <p class="mt-2 text-lg text-stone-500">{{ blend.base }} · {{ blend.flavor }}{% for b in blend.boosters.all %} · {{ b }}{% endfor %}</p>
+
+    <p class="mt-6"><span class="text-4xl font-extrabold">{{ summary.price|floatformat:2 }} €</span>
+      <span class="text-stone-500">({{ summary.price_per_kg|floatformat:2 }} €/kg)</span></p>
+    <p class="text-sm text-stone-500">{{ summary.can_grams|weight }} · {{ summary.portions }} Portionen à {{ summary.portion_grams }} g</p>
+
+    {% if variants|length > 1 %}
+      <h2 class="mb-3 mt-8 font-bold">Geschmack: <span class="font-normal">{{ blend.flavor }}</span></h2>
+      <div class="flex flex-wrap gap-2">
+        {% for variant in variants %}
+          <a href="{% url 'shop:blend_detail' variant.pk %}{% if size != 'regular' %}?groesse={{ size }}{% endif %}"
+             {% if variant.pk == blend.pk %}aria-current="true"{% endif %}
+             class="inline-flex items-center gap-2 rounded-full border-2 py-1.5 pl-1.5 pr-4 text-sm transition {% if variant.pk == blend.pk %}border-stone-950 font-semibold dark:border-white{% else %}border-stone-200 hover:border-stone-400 dark:border-stone-700{% endif %} {% if variant.is_sold_out %}opacity-45{% endif %}">
+            <span class="size-6 rounded-full ring-1 ring-black/10" style="background: {{ variant.flavor.color }}"></span>
+            <span {% if variant.is_sold_out %}class="line-through"{% endif %}>{{ variant.flavor }}</span>{% if variant.is_sold_out %}<span class="sr-only"> (ausverkauft)</span>{% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if sizes|length > 1 %}
+      <h2 class="mb-3 mt-8 font-bold">Größe</h2>
+      <div class="grid grid-cols-2 gap-3">
+        {% for value, option in sizes %}
+          <a href="?groesse={{ value }}" {% if value == size %}aria-current="true"{% endif %}
+             class="rounded-2xl border-2 p-4 transition {% if value == size %}border-stone-950 dark:border-white{% else %}border-stone-200 hover:border-stone-400 dark:border-stone-700{% endif %}">
+            <span class="block font-bold">{{ option.can_grams|weight }}</span>
+            <span class="block text-sm text-stone-500">{{ option.portions }} Portionen</span>
+            <span class="mt-1 block font-semibold">{{ option.price|floatformat:2 }} €</span>
+            <span class="text-xs text-stone-500">{{ option.price_per_kg|floatformat:2 }} €/kg{% if value == 'large' %} · 10 % gespart{% endif %}</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <form method="post" action="{% url 'orders:cart_add' blend.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="size" value="{{ size }}">
+        {% if blend.is_sold_out %}
+          <button type="button" disabled class="btn-primary cursor-not-allowed opacity-45">Ausverkauft</button>
+        {% else %}
+          <button type="submit" class="btn-primary">{% include "_icon_bag.html" %} In den Warenkorb</button>
+        {% endif %}
+      </form>
+      {% if blend.is_ready_made %}
+        <a href="{% url 'shop:configurator' %}?mix={{ blend.pk }}" class="btn-secondary">Mit Boostern anpassen</a>
+      {% endif %}
+    </div>
+
+    <h2 class="mb-3 mt-10 text-lg font-bold">Was drin ist</h2>
+    {% include "shop/_ingredient_list.html" with ingredients=blend.ingredients %}
+
+    <h2 class="mb-3 mt-10 text-lg font-bold">Nährwerte pro Portion ({{ summary.portion_grams }} g)</h2>
+    {% include "shop/_nutrition.html" %}
+  </div>
+</div>
+{% endblock %}

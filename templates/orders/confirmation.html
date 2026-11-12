@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+
+{% block title %}Bestellung bestätigt · Mischwerk{% endblock %}
+
+{% block content %}
+<h1 class="mb-2 text-4xl font-black tracking-tight">Danke für deine Bestellung!</h1>
+<p class="mb-6 text-stone-500">{{ order }} vom {{ order.created_at|date:"d.m.Y, H:i" }} Uhr.</p>
+
+<div class="grid gap-6 sm:grid-cols-2">
+  <section>
+    <h2 class="mb-2 font-medium">Positionen</h2>
+    <ul class="space-y-1">
+      {% for item in order.items.all %}
+        <li class="flex justify-between gap-2"><span>{{ item.quantity }} × {{ item.blend.name }} ({{ item.blend.flavor }}, {{ item.can_grams|weight }})</span><span>{{ item.unit_price|floatformat:2 }} €</span></li>
+      {% endfor %}
+    </ul>
+    <p class="mt-2 flex justify-between border-t border-stone-200 pt-2 font-semibold dark:border-stone-700">
+      <span>Summe</span><span>{{ order.total_price|floatformat:2 }} €</span>
+    </p>
+  </section>
+  <section>
+    <h2 class="mb-2 font-medium">Lieferadresse</h2>
+    <address class="not-italic">{{ order.name }}<br>{{ order.street }}<br>{{ order.zip_code }} {{ order.city }}</address>
+  </section>
+</div>
+
+<a href="{% url 'shop:home' %}" class="mt-8 inline-block underline">Weiter einkaufen</a>
+{% endblock %}

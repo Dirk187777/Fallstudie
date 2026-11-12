@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Registrieren · Mischwerk{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-md">
+  <h1 class="mb-2 text-4xl font-black tracking-tight">Konto anlegen</h1>
+  <p class="mb-6 text-sm text-stone-500">Mit Konto speicherst du deine Mischungen und bestellst sie mit einem Klick nach.</p>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {% include "_form_fields.html" %}
+    <button type="submit" class="btn-primary w-full">Konto anlegen</button>
+  </form>
+  <p class="mt-6 text-sm">Schon registriert? <a href="{% url 'accounts:login' %}" class="underline">Anmelden</a></p>
+</div>
+{% endblock %}

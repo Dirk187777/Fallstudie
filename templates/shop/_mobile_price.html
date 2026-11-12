@@ -1,0 +1,1 @@
+<p id="mobile-price" {% if oob %}hx-swap-oob="true"{% endif %} class="text-2xl font-extrabold"><span data-count-key="mobile-price" data-count="{{ summary.price|stringformat:'s' }}" data-decimals="2">{{ summary.price|floatformat:2 }}</span> €</p>

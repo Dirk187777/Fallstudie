@@ -1,0 +1,60 @@
+{% load shop_tags %}
+{% comment %}Parameter: blend, optional variant_count, flavor_colors, cheapest (Preis der günstigsten Sorte) und sold_out{% endcomment %}
+<article class="group">
+  <div class="relative">
+    <a href="{% url 'shop:blend_detail' blend.pk %}" class="grid aspect-[4/5] place-items-center rounded-3xl bg-stone-100 px-8 pb-6 pt-14 transition group-hover:bg-stone-200 dark:bg-stone-900 dark:group-hover:bg-stone-800">
+      {% can blend.ingredients blend.name "h-full max-h-80 w-auto transition duration-300 group-hover:-translate-y-1 group-hover:scale-[1.03]" %}
+    </a>
+    <div class="absolute left-4 top-4 flex flex-wrap gap-2">
+      {% if sold_out or blend.is_sold_out and not variant_count > 1 %}<span class="badge bg-red-700">Ausverkauft</span>{% endif %}
+      {% if blend.summary.contains_caffeine %}<span class="badge">Mit Koffein</span>{% endif %}
+      {% if not blend.is_ready_made %}<span class="badge bg-accent text-stone-950">Deine Mischung</span>{% endif %}
+    </div>
+    {% if blend.is_ready_made %}
+      <a href="{% url 'shop:configurator' %}?mix={{ blend.pk }}" title="Im Konfigurator anpassen"
+         class="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-white/80 text-stone-900 transition hover:bg-white" aria-label="{{ blend.name }} im Konfigurator anpassen">
+        <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      </a>
+    {% endif %}
+    {% if variant_count > 1 %}
+      <a href="{% url 'shop:blend_detail' blend.pk %}" class="absolute -bottom-2 -right-2 grid size-16 place-items-center rounded-full bg-stone-950 text-white ring-8 ring-white transition hover:scale-105 dark:bg-white dark:text-stone-950 dark:ring-stone-950" aria-label="{{ blend.name }}: Sorte wählen">
+        {% include "_icon_bag.html" %}
+      </a>
+    {% elif not blend.is_sold_out %}
+      <form method="post" action="{% url 'orders:cart_add' blend.pk %}" class="absolute -bottom-2 -right-2">
+        {% csrf_token %}
+        <button type="submit" class="grid size-16 place-items-center rounded-full bg-stone-950 text-white ring-8 ring-white transition hover:scale-105 dark:bg-white dark:text-stone-950 dark:ring-stone-950" aria-label="{{ blend.name }} in den Warenkorb">
+          {% include "_icon_bag.html" %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
+  <div class="mt-4 space-y-1 pr-14">
+    <div class="flex flex-wrap gap-2">
+      {% if variant_count > 1 %}
+        <span class="chip">
+          <span class="flex -space-x-1.5" aria-hidden="true">
+            {% for color in flavor_colors %}<span class="size-3.5 rounded-full ring-2 ring-white dark:ring-stone-950" style="background: {{ color }}"></span>{% endfor %}
+          </span>
+          {{ variant_count }} Sorten
+        </span>
+      {% endif %}
+      {% if blend.summary.protein %}
+        <span class="chip">{{ blend.summary.protein|floatformat:0 }} g Eiweiß</span>
+      {% elif blend.summary.caffeine_mg %}
+        <span class="chip">{{ blend.summary.caffeine_mg }} mg Koffein</span>
+      {% else %}
+        <span class="chip">Ohne Koffein</span>
+      {% endif %}
+    </div>
+    <h3 class="pt-2 text-xl font-bold leading-tight"><a href="{% url 'shop:blend_detail' blend.pk %}" class="hover:underline">{{ blend.name }}</a></h3>
+    {% if blend.description %}<p>{{ blend.description }}</p>{% endif %}
+    <p class="text-sm text-stone-500">
+      {{ blend.base }}{% if variant_count <= 1 %} · {{ blend.flavor }}{% endif %}{% for b in blend.boosters.all %} · {{ b }}{% endfor %}
+    </p>
+    {% with price=cheapest|default:blend.summary %}
+      <p class="pt-1">{% if variant_count > 1 %}<span class="text-lg">ab </span>{% endif %}<span class="text-2xl font-extrabold">{{ price.price|floatformat:2 }} €</span>
+        <span class="text-sm text-stone-500">({{ price.price_per_kg|floatformat:2 }} €/kg)</span></p>
+    {% endwith %}
+  </div>
+</article>

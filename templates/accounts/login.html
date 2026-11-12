@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Anmelden · Mischwerk{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-md">
+  <h1 class="mb-6 text-4xl font-black tracking-tight">Anmelden</h1>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {% include "_form_fields.html" %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="btn-primary w-full">Anmelden</button>
+  </form>
+  <p class="mt-6 text-sm">Noch kein Konto? <a href="{% url 'accounts:register' %}" class="underline">Jetzt registrieren</a></p>
+</div>
+{% endblock %}

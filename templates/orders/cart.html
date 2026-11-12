@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+
+{% block title %}Warenkorb · Mischwerk{% endblock %}
+
+{% block content %}
+<h1 class="mb-8 text-4xl font-black tracking-tight">Warenkorb</h1>
+{% if items %}
+  <div class="grid gap-10 lg:grid-cols-[1fr_22rem]">
+    <ul class="divide-y divide-stone-200 dark:divide-stone-800">
+      {% for item in items %}
+        <li class="flex items-center gap-4 py-4">
+          <a href="{% url 'shop:blend_detail' item.blend.pk %}" class="grid size-24 shrink-0 place-items-center rounded-2xl bg-stone-100 p-2 dark:bg-stone-900">
+            {% can item.blend.ingredients item.blend.name "h-full w-auto" item.size %}
+          </a>
+          <div class="flex-1">
+            <p class="font-bold">{{ item.blend.name }} <span class="font-normal text-stone-500">· {{ item.can_grams|weight }}</span></p>
+            {% if item.blend.is_sold_out %}<p class="text-sm font-semibold text-red-700 dark:text-red-400">Inzwischen ausverkauft, bitte entfernen</p>{% endif %}
+            <p class="text-sm text-stone-500">
+              {{ item.blend.base }}, {{ item.blend.flavor }}{% for b in item.blend.boosters.all %}, {{ b }}{% endfor %}
+            </p>
+            <div class="mt-2 flex items-center gap-3">
+              <div class="flex items-center rounded-full border border-stone-300 dark:border-stone-700" role="group" aria-label="Menge {{ item.blend.name }}">
+                {% include "orders/_quantity_button.html" with quantity=item.quantity|add:-1 label="−" aria="Eine weniger" %}
+                <span class="min-w-6 text-center font-semibold" aria-live="polite">{{ item.quantity }}</span>
+                {% include "orders/_quantity_button.html" with quantity=item.quantity|add:1 label="+" aria="Eine mehr" %}
+              </div>
+              <span class="text-sm text-stone-500">× {{ item.price|floatformat:2 }} €</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="font-bold">{{ item.subtotal|floatformat:2 }} €</p>
+            <form method="post" action="{% url 'orders:cart_remove' item.blend.pk item.size %}">
+              {% csrf_token %}
+              <button type="submit" class="text-sm text-stone-500 underline hover:text-red-700">Entfernen</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+    <aside class="rounded-[2rem] bg-stone-100 p-6 lg:self-start dark:bg-stone-900">
+      <p class="flex justify-between text-lg"><span>Summe</span><span class="text-2xl font-extrabold">{{ total|floatformat:2 }} €</span></p>
+      <p class="text-sm text-stone-500">inkl. MwSt., Versand im Prototyp kostenlos</p>
+      <a href="{% url 'orders:checkout' %}" class="btn-primary mt-6 w-full">Zur Kasse</a>
+    </aside>
+  </div>
+{% else %}
+  <div class="rounded-[2rem] bg-stone-100 p-10 text-center dark:bg-stone-900">
+    <p class="text-lg">Dein Warenkorb ist leer.</p>
+    <a href="{% url 'shop:configurator' %}" class="btn-primary mt-6">Jetzt Mischung zusammenstellen</a>
+  </div>
+{% endif %}
+{% endblock %}

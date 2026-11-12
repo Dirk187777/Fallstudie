@@ -1,0 +1,15 @@
+{
+  "name": "mischwerk",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "tailwindcss -i static/src/input.css -o static/css/output.css --minify",
+    "build:js": "mkdir -p static/vendor && cp node_modules/htmx.org/dist/htmx.min.js static/vendor/htmx.min.js",
+    "watch": "tailwindcss -i static/src/input.css -o static/css/output.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "htmx.org": "2.0.11",
+    "tailwindcss": "4.3.3"
+  }
+}

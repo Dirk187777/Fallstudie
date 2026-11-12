@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+
+{% block title %}Bestellung #{{ order.pk }} · Betrieb · Mischwerk{% endblock %}
+
+{% block content %}
+<a href="{% url 'backoffice:order_list' %}" class="text-sm underline">← Alle Bestellungen</a>
+<h1 class="mb-1 mt-2 text-2xl font-semibold">Bestellung #{{ order.pk }}</h1>
+<p class="mb-6 text-stone-500">{{ order.created_at|date:"d.m.Y, H:i" }} Uhr · {{ order.total_price|floatformat:2 }} €</p>
+
+<div class="grid gap-8 lg:grid-cols-3">
+  <section class="lg:col-span-2">
+    <h2 class="mb-2 text-lg font-medium">Rezeptur</h2>
+    <ul class="space-y-4">
+      {% for item in order.items.all %}
+        <li class="rounded-lg border border-stone-200 p-4 dark:border-stone-700">
+          <p class="mb-2 font-medium">{{ item.quantity }} × {{ item.blend.name }} · {{ item.can_grams|weight }}
+            {% if item.blend.is_ready_made %}<span class="text-sm text-stone-500">· fertiger Mix</span>{% endif %}
+          </p>
+          <dl class="grid grid-cols-[8rem_1fr] gap-1 text-sm">
+            <dt class="text-stone-500">Basis</dt><dd>{{ item.blend.base }}</dd>
+            <dt class="text-stone-500">Geschmack</dt><dd>{{ item.blend.flavor }}</dd>
+            <dt class="text-stone-500">Süße</dt><dd>{{ item.blend.get_sweetness_display }}</dd>
+            <dt class="text-stone-500">Booster</dt>
+            <dd>{% for b in item.blend.boosters.all %}{{ b }}{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}</dd>
+          </dl>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <aside class="space-y-6">
+    {% include "backoffice/_status.html" %}
+    <section>
+      <h2 class="mb-2 font-medium">Kunde</h2>
+      <p>{{ order.name }} <span class="text-stone-500">({% if order.user_id %}Kundenkonto{% else %}Gast{% endif %})</span></p>
+      <p><a href="mailto:{{ order.email }}" class="underline">{{ order.email }}</a></p>
+    </section>
+    <section>
+      <h2 class="mb-2 font-medium">Lieferadresse</h2>
+      <address class="not-italic">{{ order.name }}<br>{{ order.street }}<br>{{ order.zip_code }} {{ order.city }}</address>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+
+{% block content %}
+<section class="grid items-center gap-10 overflow-hidden rounded-[2rem] bg-stone-950 px-6 py-12 text-white md:grid-cols-2 md:px-12 md:py-16">
+  <div>
+    <span class="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold text-stone-950">Sieh, was drin ist</span>
+    <h1 class="mt-5 text-5xl font-black leading-[1.05] tracking-tight md:text-6xl">
+      Dein Protein.<br><span class="text-accent">Deine Mischung.</span>
+    </h1>
+    <p class="mt-5 max-w-md text-lg text-stone-300">
+      Protein Shake, Clear Protein, Energy oder Hydration: Wähle Basis, Geschmack und bis zu drei Booster. Wir mischen frisch nach deiner Rezeptur – Preis und Nährwerte siehst du live.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="{% url 'shop:configurator' %}" class="btn-primary bg-accent text-stone-950 hover:bg-lime-200 dark:bg-accent dark:text-stone-950">Mischung zusammenstellen</a>
+      <a href="#mixe" class="btn-secondary border-white text-white hover:bg-white hover:text-stone-950">Fertige Mixe</a>
+    </div>
+  </div>
+  <div class="relative flex items-end justify-center py-4" aria-hidden="true">
+    <div class="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(198,244,50,.35),transparent_65%)]"></div>
+    {% for blend in hero %}
+      <div class="relative {% if forloop.counter == 2 %}z-10 w-48 md:w-56{% else %}-mx-8 w-36 md:w-44{% endif %}">
+        {% can blend.ingredients blend.name "w-full drop-shadow-2xl" %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="grid gap-6 py-12 sm:grid-cols-3">
+  <div><p class="text-3xl font-black">01</p><h2 class="mt-1 font-bold">Frisch gemischt</h2><p class="text-stone-500">Jede Dose wird nach deiner Rezeptur gemischt, nicht aus dem Regal genommen.</p></div>
+  <div><p class="text-3xl font-black">02</p><h2 class="mt-1 font-bold">Sichtfenster statt Kleingedrucktem</h2><p class="text-stone-500">Jede Zutat ist eine Schicht in der Dose – du siehst sofort, was drin ist.</p></div>
+  <div><p class="text-3xl font-black">03</p><h2 class="mt-1 font-bold">Klar dosiert</h2><p class="text-stone-500">Maximal drei Booster pro Mischung und ein deutlicher Hinweis bei Koffein.</p></div>
+</section>
+
+<section id="mixe" class="scroll-mt-24">
+  <div class="mb-4 flex flex-wrap items-end justify-between gap-2">
+    <h2 class="text-3xl font-black tracking-tight">Fertige Mixe</h2>
+    <p class="text-stone-500">Bestellen wie sie sind – oder im Konfigurator anpassen.</p>
+  </div>
+  <nav class="mb-10 flex flex-wrap gap-2" aria-label="Produktlinien">
+    {% for section in sections %}
+      <a href="#{{ section.line }}" class="chip hover:border-stone-950 dark:hover:border-white">{{ section.label }}</a>
+    {% endfor %}
+  </nav>
+  {% for section in sections %}
+    <div id="{{ section.line }}" class="mb-16 scroll-mt-24">
+      <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2">
+        <h3 class="text-2xl font-bold">{{ section.label }}</h3>
+        <a href="{% url 'shop:configurator' %}?linie={{ section.line }}" class="text-sm font-semibold underline">Eigene {{ section.label }}-Mischung erstellen →</a>
+      </div>
+      <div class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        {% for product in section.products %}
+          {% include "shop/_product_card.html" with blend=product.blend variant_count=product.variant_count cheapest=product.cheapest flavor_colors=product.flavor_colors sold_out=product.sold_out %}
+        {% empty %}
+          <p class="text-stone-500">Noch keine Mixe in dieser Linie.</p>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}

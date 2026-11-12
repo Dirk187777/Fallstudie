@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+
+{% block title %}Mein Konto · Mischwerk{% endblock %}
+
+{% block content %}
+<h1 class="mb-8 text-4xl font-black tracking-tight">Hallo {{ user.first_name }}</h1>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-2xl font-bold">Meine Mischungen</h2>
+  <div class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+    {% for blend in blends %}
+      {% include "shop/_product_card.html" %}
+    {% empty %}
+      <p class="text-stone-500">Noch keine eigenen Mischungen. <a href="{% url 'shop:configurator' %}" class="underline">Zum Konfigurator</a></p>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2 class="mb-4 text-2xl font-bold">Meine Bestellungen</h2>
+  <ul class="divide-y divide-stone-200 dark:divide-stone-700">
+    {% for order in orders %}
+      <li class="py-3">
+        <p class="flex justify-between gap-4">
+          <span class="font-medium">{{ order }} vom {{ order.created_at|date:"d.m.Y" }}</span>
+          <span>{{ order.get_status_display }} · {{ order.total_price|floatformat:2 }} €</span>
+        </p>
+        <p class="text-sm text-stone-500">
+          {% for item in order.items.all %}{{ item.quantity }} × {{ item.blend.name }} ({{ item.blend.flavor }}, {{ item.can_grams|weight }}){% if not forloop.last %}, {% endif %}{% endfor %}
+        </p>
+      </li>
+    {% empty %}
+      <li class="py-3 text-stone-500">Noch keine Bestellungen.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

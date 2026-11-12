@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent: #c6f432;
+}
+
+/* Abstand zur festen Kopfzeile, damit fokussierte oder angesprungene Elemente nicht darunter verschwinden */
+html {
+  scroll-padding-top: 5rem;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-stone-950 px-6 py-3 font-semibold text-white transition hover:bg-stone-700 dark:bg-white dark:text-stone-950 dark:hover:bg-stone-200;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-stone-950 px-6 py-3 font-semibold transition hover:bg-stone-950 hover:text-white dark:border-white dark:hover:bg-white dark:hover:text-stone-950;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-stone-300 px-3 py-1 text-sm dark:border-stone-600;
+  }
+  .badge {
+    @apply rounded-full bg-stone-950 px-3 py-1 text-sm font-semibold text-white;
+  }
+}
+
+/* Einheitliche Eingabefelder für alle Formulare aus templates/_form_fields.html */
+.form-fields input:not([type="checkbox"], [type="radio"]) {
+  @apply w-full rounded-xl border border-stone-300 bg-white px-4 py-3 dark:border-stone-600 dark:bg-stone-900;
+}
+
+/* Konfigurator-Animationen, gesteuert von static/js/configurator.js */
+.layer-move {
+  transition: y 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fill-move {
+  transition: fill 0.5s ease, stroke 0.5s ease;
+}
+.layer-in {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: layer-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes layer-in {
+  from { transform: translateY(-60px) scaleY(0.3); opacity: 0; }
+  50% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+.can-bump {
+  transform-origin: 50% 100%;
+  animation: can-bump 0.5s ease;
+}
+@keyframes can-bump {
+  30% { transform: rotate(-2deg) scale(1.02); }
+  60% { transform: rotate(1.5deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .layer-move, .fill-move, .layer-in, .can-bump { transition: none; animation: none; }
+}

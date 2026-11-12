@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'orders:cart_update' item.blend.pk item.size %}">
+  {% csrf_token %}
+  <input type="hidden" name="quantity" value="{{ quantity }}">
+  <button type="submit" class="grid size-9 place-items-center rounded-full text-lg font-semibold hover:bg-stone-100 dark:hover:bg-stone-800" aria-label="{{ aria }}">{{ label }}</button>
+</form>

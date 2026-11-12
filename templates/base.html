@@ -1,0 +1,52 @@
+{% load static %}<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Mischwerk – Protein nach deinem Rezept{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+</head>
+<body class="flex min-h-screen flex-col bg-white text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100">
+  <header class="sticky top-0 z-30 border-b border-stone-200 bg-white/85 backdrop-blur dark:border-stone-800 dark:bg-stone-950/85">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      <a href="{% url 'shop:home' %}" class="text-xl font-black tracking-widest">MISCHWERK</a>
+      <div class="flex items-center gap-5 text-sm font-medium">
+        <a href="{% url 'shop:configurator' %}" class="hidden hover:underline sm:inline">Konfigurator</a>
+        {% if user.is_staff %}
+          <a href="{% url 'backoffice:order_list' %}" class="hover:underline">Betrieb</a>
+        {% endif %}
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:account' %}" class="hover:underline">Mein Konto</a>
+          <form method="post" action="{% url 'accounts:logout' %}" class="hidden sm:block">
+            {% csrf_token %}
+            <button type="submit" class="hover:underline">Abmelden</button>
+          </form>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="hover:underline">Anmelden</a>
+        {% endif %}
+        <a href="{% url 'orders:cart' %}" class="relative grid size-10 place-items-center rounded-full bg-stone-950 text-white dark:bg-white dark:text-stone-950" aria-label="Warenkorb, {{ cart_count }} Artikel">
+          {% include "_icon_bag.html" %}
+          {% if cart_count %}
+            <span class="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-accent text-xs font-bold text-stone-950">{{ cart_count }}</span>
+          {% endif %}
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+    {% for message in messages %}
+      <p class="mb-6 rounded-2xl p-4 {% if message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-stone-100 dark:bg-stone-900{% endif %}" role="status">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="border-t border-stone-200 py-8 text-sm text-stone-500 dark:border-stone-800">
+    <div class="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 px-4">
+      <p><span class="font-black tracking-widest text-stone-900 dark:text-stone-100">MISCHWERK</span> · Fallstudie Systemanalyse, Prototyp</p>
+      <p>Alle Preise inkl. MwSt. · Jede Dose = 30 Portionen</p>
+    </div>
+  </footer>
+</body>
+</html>

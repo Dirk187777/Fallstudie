@@ -1,0 +1,11 @@
+<dl class="grid grid-cols-2 gap-2">
+  <div class="rounded-2xl border border-stone-300 p-3 dark:border-stone-700"><dt class="text-xs text-stone-500">Energie</dt><dd class="text-lg font-bold"><span data-count-key="kcal" data-count="{{ summary.kcal|stringformat:'s' }}">{{ summary.kcal|floatformat:0 }}</span> kcal</dd></div>
+  <div class="rounded-2xl border border-stone-300 p-3 dark:border-stone-700"><dt class="text-xs text-stone-500">Eiweiß</dt><dd class="text-lg font-bold"><span data-count-key="protein" data-count="{{ summary.protein|stringformat:'s' }}" data-decimals="1">{{ summary.protein|floatformat:1 }}</span> g</dd></div>
+  <div class="rounded-2xl border border-stone-300 p-3 dark:border-stone-700"><dt class="text-xs text-stone-500">Kohlenhydrate</dt><dd class="text-lg font-bold"><span data-count-key="carbs" data-count="{{ summary.carbs|stringformat:'s' }}" data-decimals="1">{{ summary.carbs|floatformat:1 }}</span> g</dd></div>
+  <div class="rounded-2xl border border-stone-300 p-3 dark:border-stone-700"><dt class="text-xs text-stone-500">Fett</dt><dd class="text-lg font-bold"><span data-count-key="fat" data-count="{{ summary.fat|stringformat:'s' }}" data-decimals="1">{{ summary.fat|floatformat:1 }}</span> g</dd></div>
+</dl>
+{% if summary.contains_caffeine %}
+  <p class="mt-3 rounded-2xl bg-amber-100 p-3 text-sm text-amber-900">
+    <strong>Enthält {{ summary.caffeine_mg }} mg Koffein pro Portion.</strong> Nicht empfohlen für Kinder, Schwangere und Stillende.
+  </p>
+{% endif %}

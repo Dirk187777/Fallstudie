@@ -1,0 +1,17 @@
+<section id="status" class="rounded-lg border border-stone-200 p-4 dark:border-stone-700">
+  <h2 class="mb-2 font-medium">Status</h2>
+  <p class="mb-4">{% include "backoffice/_status_badge.html" with status=order.status label=order.get_status_display %}</p>
+  <form method="post" action="{% url 'backoffice:order_set_status' order.pk %}"
+        hx-post="{% url 'backoffice:order_set_status' order.pk %}" hx-target="#status" hx-swap="outerHTML"
+        class="flex flex-wrap gap-2">
+    {% csrf_token %}
+    {% for value, label in order.Status.choices %}
+      {% if value != order.status %}
+        <button type="submit" name="status" value="{{ value }}"
+                class="rounded-lg border border-stone-300 px-3 py-1 text-sm hover:bg-stone-100 dark:border-stone-600 dark:hover:bg-stone-800">
+          → {{ label }}
+        </button>
+      {% endif %}
+    {% endfor %}
+  </form>
+</section>

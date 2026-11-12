@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Bestellungen · Betrieb · Mischwerk{% endblock %}
+
+{% block content %}
+<h1 class="mb-6 text-2xl font-semibold">Bestellungen</h1>
+{% include "backoffice/_nav.html" %}
+
+{% if low_stock %}
+  <section class="mb-6 rounded-2xl bg-amber-100 p-4 text-amber-950" role="alert">
+    <h2 class="font-semibold">Lagerwarnung: {{ low_stock|length }} Zutat{{ low_stock|length|pluralize:"en" }} unter Mindestbestand</h2>
+    <ul class="mt-2 flex flex-wrap gap-2 text-sm">
+      {% for ingredient in low_stock %}
+        <li class="rounded-full bg-white/70 px-3 py-1">{{ ingredient.name }}: {{ ingredient.stock }} von mind. {{ ingredient.min_stock }} Portionen{% if ingredient.is_sold_out %} · ausverkauft{% endif %}</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'backoffice:stock_list' %}" class="mt-3 inline-block text-sm font-semibold underline">Zum Lager</a>
+  </section>
+{% endif %}
+
+<nav class="mb-6 flex flex-wrap gap-2 text-sm" aria-label="Nach Status filtern">
+  <a href="{% url 'backoffice:order_list' %}"
+     class="rounded-full border px-3 py-1 {% if not active_status %}border-emerald-700 bg-emerald-700 text-white{% else %}border-stone-300 dark:border-stone-600{% endif %}">
+    Alle ({{ total_count }})
+  </a>
+  {% for value, label, count in tabs %}
+    <a href="?status={{ value }}"
+       class="rounded-full border px-3 py-1 {% if active_status == value %}border-emerald-700 bg-emerald-700 text-white{% else %}border-stone-300 dark:border-stone-600{% endif %}">
+      {{ label }} ({{ count }})
+    </a>
+  {% endfor %}
+</nav>
+
+<div class="overflow-x-auto">
+  <table class="w-full text-left text-sm">
+    <thead class="border-b border-stone-300 text-stone-500 dark:border-stone-600">
+      <tr>
+        <th class="py-2 pr-4">Nr.</th>
+        <th class="py-2 pr-4">Datum</th>
+        <th class="py-2 pr-4">Kunde</th>
+        <th class="py-2 pr-4 text-right">Positionen</th>
+        <th class="py-2 pr-4 text-right">Summe</th>
+        <th class="py-2">Status</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-stone-200 dark:divide-stone-700">
+      {% for order in orders %}
+        <tr class="hover:bg-stone-100 dark:hover:bg-stone-800">
+          <td class="py-2 pr-4"><a href="{% url 'backoffice:order_detail' order.pk %}" class="font-medium underline">#{{ order.pk }}</a></td>
+          <td class="py-2 pr-4">{{ order.created_at|date:"d.m.Y H:i" }}</td>
+          <td class="py-2 pr-4">{{ order.name }} <span class="text-stone-500">{% if order.user_id %}· Konto{% else %}· Gast{% endif %}</span></td>
+          <td class="py-2 pr-4 text-right">{{ order.item_count }}</td>
+          <td class="py-2 pr-4 text-right">{{ order.total_price|floatformat:2 }} €</td>
+          <td class="py-2">{% include "backoffice/_status_badge.html" with status=order.status label=order.get_status_display %}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="py-6 text-center text-stone-500">Keine Bestellungen.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
